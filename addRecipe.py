@@ -7,4 +7,3 @@ def addEntry():
 
     label = tk.Label(entry_frame, font=("Helvetica", 24), text = "Trisha's Meal Planner")
     label.grid(row=0, column=0)
-ew

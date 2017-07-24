@@ -1,4 +1,5 @@
 from tkinter import *
+import sqlite3
 
 LARGE_FONT=("Verdana", 24)
 MEDIUM_FONT=("Verdana", 12)
@@ -61,3 +62,6 @@ def submit(name, time, servings, favorite, ingredients, directions):
     print("favorite: ", favorite)
     print("ingredients: ", ingredients)
     print("directions: ", directions)
+
+
+

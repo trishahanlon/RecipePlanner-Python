@@ -24,7 +24,7 @@ class makeMealPlan(Frame):
         cal_x = calendar.month(NOW.year, NOW.month, w=2, l=1)
         cal_out = Label(
             self,
-            bg='lightblue',
+            bg='#d3d3d3',
             font=('courier', 12),
             justify=LEFT,
             text=cal_x

@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import messagebox
 import sqlite3
 
 LARGE_FONT=("Verdana", 24)
@@ -11,8 +12,8 @@ class addARecipe(Frame):
         label.grid(row=0, column=0)
 
         name = StringVar()
-        time = IntVar()
-        servings = IntVar()
+        time = StringVar()
+        servings = StringVar()
         favoriteVar = IntVar()
 
         recipeNameLabel = Label(self, text="Recipe Name", font=MEDIUM_FONT)
@@ -63,5 +64,21 @@ def submit(name, time, servings, favorite, ingredients, directions):
     print("ingredients: ", ingredients)
     print("directions: ", directions)
 
+    database_file = "meal_planner" + ".db"
+    try:
+        intTime = int(time)
+        try:
+            intServings = int(servings)
+
+            with sqlite3.connect(database_file) as conn:
+                # create the table if it hasn't been created yet
+                conn.execute('''CREATE TABLE IF NOT EXISTS recipe
+                     (name text, time int, servings int, favorite text, ingredients text, directions text)''')
+                conn.execute("""INSERT INTO recipe VALUES (?, ?, ?, ?, ?, ?);""",
+                             (name, intTime, intServings, favorite, ingredients, directions))
+        except ValueError:
+            messagebox.showerror("Incorrect Value", "Servings must be an int")
+    except ValueError:
+        messagebox.showerror("Incorrect Value", "Time must be an int")
 
 

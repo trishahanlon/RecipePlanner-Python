@@ -14,10 +14,13 @@ class mealPlanner(Tk):
     def __init__(self, *args, **kwargs):
         Tk.__init__(self, *args, **kwargs)
         container = Frame(self)
-        container.pack(side="top", fill="both", expand=True)
+        container.pack(side="top", fill="both", expand=FALSE)
 
-        container.grid_rowconfigure(0, weight=1)
-        container.grid_columnconfigure(0, weight=1)
+        container.rowconfigure(0, weight=1)
+        container.columnconfigure(0, weight=1)
+
+        container.rowconfigure(1, weight=3)
+        container.columnconfigure(1, weight=3)
 
         self.frames = {}
         for my_frame in (firstPage, addARecipe, makeMealPlan):
@@ -31,6 +34,6 @@ class mealPlanner(Tk):
         frame.tkraise()
 
 app = mealPlanner()
-app.maxsize(1000,6000)
-app.minsize(1000,600)
+app.maxsize(900,600)
+app.minsize(900,600)
 app.mainloop()

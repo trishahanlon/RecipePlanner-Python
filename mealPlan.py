@@ -4,6 +4,7 @@ import datetime
 from isoweek import Week
 from tkinter import ttk
 import sqlite3
+import string
 
 LARGE_FONT=("Verdana", 24)
 MEDIUM_FONT=("Verdana", 14)
@@ -136,14 +137,20 @@ class makeMealPlan(Frame):
                 selection = cursor.execute("""SELECT * FROM """ + tableName)
                 for result in [selection]:
                     for row in result.fetchall():
-                        print(row)
+                        # print(row)
                         i = i +1
 
-                        ## need to help pretty print this... has random tabs, enters, and {}
-                        ## look into beautiful soup for this.
-                        Label(shoppingListFrame, text=row, font=MEDIUM_FONT).grid(row=i, column=0)
+                        row = str(row)
+                        row = row.translate(row.maketrans("","","()'{}<>,"))
+                        row = row.replace('\\n', '')
+                        row = row.replace('\\t', '')
+                        digit = re.findall(r'[\/\d\.]+', row)
+                        print(str(digit))
+                        print(row)
 
-            Button(shoppingListFrame, text = "Return to Menu View", command=lambda: [shoppingListFrame.grid_forget(), topView.grid(), menu.grid()]).grid(row=2, column=0)
+                        Label(shoppingListFrame, text=str(row), font=MEDIUM_FONT).grid(row=i, column=0)
+
+            Button(shoppingListFrame, text = "Return to Menu View", command=lambda: [shoppingListFrame.grid_forget(), topView.grid(), menu.grid()]).grid(row=i+1, column=0)
 
 
         def saveIngredients(ingredients):

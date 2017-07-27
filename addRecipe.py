@@ -38,8 +38,12 @@ class addARecipe(Frame):
         directions = Text(self, bg='#d3d3d3', width=30, height=20)
         directions.grid(row=6, column=1)
 
-        Button(self, text="Submit Recipe", command = lambda: submit(name.get(), time.get(), servings.get(), favoriteVar.get(),
-                                                                                      ingredients.get("1.0", END), directions.get("1.0", END))).grid(row=7, column=0)
+
+        submit_button = Button(self, text="Submit Recipe", command = lambda: [(submit(name.get(), time.get(),
+                                                                                          servings.get(), favoriteVar.get(),ingredients.get("1.0", END),
+                                                                                          directions.get("1.0", END)), controller.show_frame(firstPage)),
+                                                                              messagebox.showinfo("Success", "Successful saved to database.")])
+        submit_button.grid(row=7, column=0)
 
         from firstpage import firstPage
         Button(self, text="Return Home", command=lambda: controller.show_frame(firstPage)).grid(row=8, column=0)
@@ -51,6 +55,7 @@ def submit(name, time, servings, favorite, ingredients, directions):
     print("favorite: ", favorite)
     print("ingredients: ", ingredients)
     print("directions: ", directions)
+
 
     database_file = "meal_planner" + ".db"
     try:

@@ -13,7 +13,14 @@ NOW = datetime.datetime.now()
 class makeMealPlan(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
-        Label(self, text="Make Meal Page", font=LARGE_FONT).grid(row=0, column=0)
+
+        topView = Frame(self)
+        topView.rowconfigure(0, weight=1)
+        topView.columnconfigure(0, weight=1)
+        topView.rowconfigure(1, weight=3)
+        topView.columnconfigure(1, weight=3)
+        topView.grid(row=0, column=0)
+        Label(topView, text="Make Meal Page", font=LARGE_FONT).grid(row=0, column=0)
 
         dt = datetime.date(NOW.year, NOW.month, NOW.day)
         weekNumber = dt.isocalendar()[1]
@@ -21,7 +28,7 @@ class makeMealPlan(Frame):
 
         cal_x = calendar.month(NOW.year, NOW.month, w=2, l=1)
         cal_out = Label(
-            self,
+            topView,
             bg='#d3d3d3',
             font=('courier', 12),
             justify=LEFT,
@@ -67,6 +74,7 @@ class makeMealPlan(Frame):
 
         def addMeal(rowLocation, columnLocation):
             menu.grid_forget()
+            topView.grid_forget()
             addMealFrame = Frame(self)
             addMealFrame.rowconfigure(0, weight=1)
             addMealFrame.columnconfigure(0, weight=1)
@@ -104,6 +112,7 @@ class makeMealPlan(Frame):
                     key.destroy()
             recipeLabel = Label(menu, text=recipe)
             recipeLabel.grid(row = row, column = column)
+            topView.grid()
             menu.grid()
 
         from firstpage import firstPage

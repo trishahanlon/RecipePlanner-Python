@@ -18,7 +18,6 @@ class makeMealPlan(Frame):
         dt = datetime.date(NOW.year, NOW.month, NOW.day)
         weekNumber = dt.isocalendar()[1]
         w = Week(NOW.year, weekNumber)
-        print ("Week %s starts on %s and ends on %s" % (w, w.monday(), w.sunday()))
 
         cal_x = calendar.month(NOW.year, NOW.month, w=2, l=1)
         cal_out = Label(
@@ -56,17 +55,17 @@ class makeMealPlan(Frame):
             sep.grid(row=i+1, column=1, padx=5, sticky="nsew")
 
         buttonDict = {}
+        listOfButtons = []
         for rows in range(len(labels)):
             for columns in range(len(columnLabels)):
                 # buttons = Button(menu, text="Add meal to day", command=lambda x=rows+1, y=columns+2: addMeal(x, y))
                 buttons = Button(menu, text="Add meal to day", command=lambda x=rows + 1, y=columns + 2: addMeal(x, y))
                 buttons.grid(row=rows+1, column=columns+2)
-                buttons.position = (rows+1,columns+2)
+                buttons.position = (rows+1, columns+2)
                 buttonDict[buttons] = buttons.position
+                listOfButtons.append(buttons)
 
         def addMeal(rowLocation, columnLocation):
-            print("add meal")
-            print(rowLocation, columnLocation)
             menu.grid_forget()
             addMealFrame = Frame(self)
             addMealFrame.rowconfigure(0, weight=1)
@@ -92,21 +91,20 @@ class makeMealPlan(Frame):
                         print (name, time, servings, favorite, ingredients, directions)
                         recipeNames.append(name)
 
-            print(str(len(recipeNames)))
             for i in range(len(recipeNames)):
-                Button(addMealFrame, text=recipeNames[i], command=lambda:newFunction(recipeNames[i], addMealFrame,
+                Button(addMealFrame, text=recipeNames[i], command=lambda x = recipeNames[i]:newFunction(x, addMealFrame,
                                                                                      rowLocation, columnLocation)).grid(row=i, column=0)
 
-
         def newFunction(recipe, view, row, column):
-            print("hi from new function")
             print(recipe)
             view.grid_forget()
-
+            searchIndex = (row, column)
+            for key, value in buttonDict.items():
+                if value == searchIndex:
+                    key.destroy()
             recipeLabel = Label(menu, text=recipe)
             recipeLabel.grid(row = row, column = column)
             menu.grid()
-
 
         from firstpage import firstPage
         Button(self, text="Return Home", command=lambda: controller.show_frame(firstPage)).grid(row=9, column=0)

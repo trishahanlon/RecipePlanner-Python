@@ -57,7 +57,7 @@ def submit(name, time, servings, favorite, ingredients, directions):
     print("directions: ", directions)
 
 
-    database_file = "meal_planner" + ".db"
+    database_file = "meal_planner.db"
     try:
         intTime = int(time)
         try:

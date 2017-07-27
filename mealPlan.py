@@ -36,6 +36,8 @@ class makeMealPlan(Frame):
         )
         cal_out.grid(row=1, column=0, columnspan=2)
 
+        Button(topView, text="View Shopping List", command=lambda: viewShoppingList()).grid(row=3, column=1)
+
         menu = Frame(self)
         menu.rowconfigure(0, weight=1)
         menu.columnconfigure(0, weight=1)
@@ -83,7 +85,7 @@ class makeMealPlan(Frame):
             addMealFrame.grid(row=2, column=0)
 
             recipeNames = []
-
+            ingredientList = []
             database_file = "meal_planner.db"
             with sqlite3.connect(database_file) as conn:
                 cursor = conn.cursor()
@@ -96,24 +98,37 @@ class makeMealPlan(Frame):
                         favorite = row[3]
                         ingredients = row[4]
                         directions = row[5]
-                        print (name, time, servings, favorite, ingredients, directions)
                         recipeNames.append(name)
-
+                        ingredientList.append(ingredients)
             for i in range(len(recipeNames)):
-                Button(addMealFrame, text=recipeNames[i], command=lambda x = recipeNames[i]:newFunction(x, addMealFrame,
+                Button(addMealFrame, text=recipeNames[i], command=lambda x=recipeNames[i], y=ingredientList[i]:addRecipe(x, y, addMealFrame,
                                                                                      rowLocation, columnLocation)).grid(row=i, column=0)
 
-        def newFunction(recipe, view, row, column):
-            print(recipe)
+        def addRecipe(recipe, ingredients, view, row, column):
             view.grid_forget()
             searchIndex = (row, column)
             for key, value in buttonDict.items():
                 if value == searchIndex:
                     key.destroy()
+
+            saveIngredients(ingredients)
             recipeLabel = Label(menu, text=recipe)
             recipeLabel.grid(row = row, column = column)
             topView.grid()
             menu.grid()
 
+        def viewShoppingList():
+            print("shopping list")
+
+        def saveIngredients(ingredients):
+            print(ingredients)
+            print(type(ingredients))
+            database_file = "meal_planner.db"
+            with sqlite3.connect(database_file) as conn:
+                # create the table if it hasn't been created yet
+                tableName = "ingredients_" + str(weekNumber)
+                conn.execute('''CREATE TABLE IF NOT EXISTS ''' + tableName + ''' (ingredients text)''')
+                conn.execute("""INSERT INTO """ + tableName + """ VALUES (?);""", (ingredients,))
+
         from firstpage import firstPage
-        Button(self, text="Return Home", command=lambda: controller.show_frame(firstPage)).grid(row=9, column=0)
+        Button(topView, text="Return Home", command=lambda: controller.show_frame(firstPage)).grid(row=3, column=0)

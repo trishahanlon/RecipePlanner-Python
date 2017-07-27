@@ -119,10 +119,34 @@ class makeMealPlan(Frame):
 
         def viewShoppingList():
             print("shopping list")
+            shoppingListFrame = Frame(self)
+            shoppingListFrame.rowconfigure(0, weight=1)
+            shoppingListFrame.columnconfigure(0, weight=1)
+            shoppingListFrame.rowconfigure(1, weight=3)
+            shoppingListFrame.columnconfigure(1, weight=3)
+            shoppingListFrame.grid(row=2, column=0)
+
+            menu.grid_forget()
+            topView.grid_forget()
+            i = 0
+            database_file = "meal_planner.db"
+            with sqlite3.connect(database_file) as conn:
+                cursor = conn.cursor()
+                tableName = "ingredients_" + str(weekNumber)
+                selection = cursor.execute("""SELECT * FROM """ + tableName)
+                for result in [selection]:
+                    for row in result.fetchall():
+                        print(row)
+                        i = i +1
+
+                        ## need to help pretty print this... has random tabs, enters, and {}
+                        ## look into beautiful soup for this.
+                        Label(shoppingListFrame, text=row, font=MEDIUM_FONT).grid(row=i, column=0)
+
+            Button(shoppingListFrame, text = "Return to Menu View", command=lambda: [shoppingListFrame.grid_forget(), topView.grid(), menu.grid()]).grid(row=2, column=0)
+
 
         def saveIngredients(ingredients):
-            print(ingredients)
-            print(type(ingredients))
             database_file = "meal_planner.db"
             with sqlite3.connect(database_file) as conn:
                 # create the table if it hasn't been created yet

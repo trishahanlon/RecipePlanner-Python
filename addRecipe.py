@@ -21,7 +21,7 @@ class addARecipe(Frame):
                      command=lambda: controller.show_frame(firstPage))
         img.image = render
         img.pack(side=LEFT)
-        label = Label(menuFrame, text="Add a Recipe Page", font=LARGE_FONT, bg="#e7e7e7", fg="#272822")
+        label = Label(menuFrame, text="Add a Recipe", font=LARGE_FONT, bg="#e7e7e7", fg="#272822")
         label.pack(side=LEFT, padx=300)
 
         #

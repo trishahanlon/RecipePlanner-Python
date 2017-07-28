@@ -4,8 +4,7 @@ import datetime
 from isoweek import Week
 from tkinter import ttk
 import sqlite3
-import string
-from collections import Counter
+from PIL import Image, ImageTk
 
 LARGE_FONT=("Trebuchet MS", 24)
 MEDIUM_FONT=("Trebuchet MS", 14)
@@ -14,15 +13,23 @@ NOW = datetime.datetime.now()
 
 class makeMealPlan(Frame):
     def __init__(self, parent, controller):
-        Frame.__init__(self, parent)
+        Frame.__init__(self, parent, bg="#f8f8f8")
+        menuFrame = Frame(self, bg="#e7e7e7")
+        menuFrame.grid(row=0, column=0)
+        load = Image.open("home.jpg")
+        render = ImageTk.PhotoImage(load)
+        from firstpage import firstPage
+        img = Button(menuFrame, image=render, borderwidth=0, highlightthickness=0, highlightbackground="#e7e7e7",
+                     command=lambda: controller.show_frame(firstPage))
+        img.image = render
+        img.pack(side=LEFT)
+        label = Label(menuFrame, text="Meal Planner", font=LARGE_FONT, bg="#e7e7e7", fg="#272822")
+        label.pack(side=LEFT, padx=300)
+
 
         topView = Frame(self)
-        topView.rowconfigure(0, weight=1)
-        topView.columnconfigure(0, weight=1)
-        topView.rowconfigure(1, weight=3)
-        topView.columnconfigure(1, weight=3)
-        topView.grid(row=0, column=0)
-        Label(topView, text="Make Meal Page", font=LARGE_FONT).grid(row=0, column=0)
+
+        # topView.grid(row=0, column=0)
 
         dt = datetime.date(NOW.year, NOW.month, NOW.day)
         weekNumber = dt.isocalendar()[1]
@@ -167,5 +174,3 @@ class makeMealPlan(Frame):
                 conn.execute('''CREATE TABLE IF NOT EXISTS ''' + tableName + ''' (ingredients text)''')
                 conn.execute("""INSERT INTO """ + tableName + """ VALUES (?);""", (ingredients,))
 
-        from firstpage import firstPage
-        Button(topView, text="Return Home", command=lambda: controller.show_frame(firstPage)).grid(row=3, column=0)

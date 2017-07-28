@@ -14,13 +14,10 @@ class mealPlanner(Tk):
     def __init__(self, *args, **kwargs):
         Tk.__init__(self, *args, **kwargs)
         container = Frame(self)
-        container.pack(side="top", fill="both", expand=FALSE)
+        container.pack(fill="both", expand=TRUE)
 
         container.rowconfigure(0, weight=1)
         container.columnconfigure(0, weight=1)
-
-        container.rowconfigure(1, weight=3)
-        container.columnconfigure(1, weight=3)
 
         self.frames = {}
         for my_frame in (firstPage, addARecipe, makeMealPlan):

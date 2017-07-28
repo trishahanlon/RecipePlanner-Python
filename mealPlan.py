@@ -44,7 +44,7 @@ class MakeMealPlan(Frame):
 
         columnLabels = ["Breakfast", "Lunch", "Dinner"]
         for i in range(len(columnLabels)):
-            Label(menu, text = columnLabels[i], font = ("Trebuchet MS", 16), bg="#f8f8f8").grid(row=0, column=i+2, pady= 10,
+            Label(menu, text=columnLabels[i], font=("Trebuchet MS", 16), bg="#f8f8f8").grid(row=0, column=i+2, pady= 10,
                                                                                         padx=85, sticky="nsew")
         mondayText = "Monday " + str(w.monday())
         tuesdayText = "Tuesday " + str(w.tuesday())
@@ -56,7 +56,7 @@ class MakeMealPlan(Frame):
 
         labels = [mondayText, tuesdayText, wednesdayText, thursdayText, fridayText, saturdayText, sundayText]
         for i in range(len(labels)):
-            Label(menu, font = ("Trebuchet MS", 12), bg="#f8f8f8", text = labels[i]).grid(row=i+1, column=0, padx = 5, pady=15, sticky="w")
+            Label(menu, font=("Trebuchet MS", 12), bg="#f8f8f8", text=labels[i]).grid(row=i+1, column=0, padx = 5, pady=15, sticky="w")
             sep = ttk.Separator(menu, orient="vertical")
             sep.grid(row=i+1, column=1, padx=5, sticky="nsew")
 
@@ -64,7 +64,6 @@ class MakeMealPlan(Frame):
         listOfButtons = []
         for rows in range(len(labels)):
             for columns in range(len(columnLabels)):
-                # buttons = Button(menu, text="Add meal to day", command=lambda x=rows+1, y=columns+2: addMeal(x, y))
                 buttons = Button(menu, text="Add meal to day", highlightbackground="#f8f8f8", command=lambda x=rows + 1, y=columns + 2: add_meal(x, y))
                 buttons.grid(row=rows+1, column=columns+2)
                 buttons.position = (rows+1, columns+2)
@@ -104,7 +103,7 @@ class MakeMealPlan(Frame):
             for key, value in buttonDict.items():
                 if value == searchIndex:
                     key.destroy()
-
+            save_weeks_recipes(recipe, row, column)
             save_ingredients(ingredients)
             recipeLabel = Label(menu, text=recipe, bg="#f8f8f8")
             recipeLabel.grid(row = row, column = column)
@@ -131,7 +130,6 @@ class MakeMealPlan(Frame):
                         string = ("Name: {} \n Cook time: {} \n Number of Servings: {} \n ".format(name, time, servings))
                         secondString = ("Ingredients: {}".format(ingredients))
                         thirdString = ("Directions: {}".format(directions))
-
             Label(viewRecipeFrame, text=string, font=MEDIUM_FONT, bg="#f8f8f8", fg="#000000").pack(side=TOP)
             Label(viewRecipeFrame, text=secondString, font=MEDIUM_FONT, bg="#f8f8f8", fg="#000000").pack(side=TOP)
             Label(viewRecipeFrame, text=thirdString, font=MEDIUM_FONT, bg="#f8f8f8", fg="#000000").pack(side=TOP)
@@ -169,7 +167,7 @@ class MakeMealPlan(Frame):
                             item_array.append(str(ingredient).split())
                         i = i +1
                         Label(groceryListFrame, text=ingredient, font=MEDIUM_FONT, justify=LEFT).grid(row=i, column=0, sticky="w")
-
+            
 
             j = 0
             for item in item_array:
@@ -189,4 +187,13 @@ class MakeMealPlan(Frame):
                 tableName = "ingredients_" + str(weekNumber)
                 conn.execute('''CREATE TABLE IF NOT EXISTS ''' + tableName + ''' (ingredients text)''')
                 conn.execute("""INSERT INTO """ + tableName + """ VALUES (?);""", (ingredients,))
-
+            
+        def save_weeks_recipes(recipeName, row, column):
+            print("save weeks")
+            database_file = "meal_planner.db"
+            with sqlite3.connect(database_file) as conn:
+                # create the table if it hasn't been created yet
+                tableName = "recipes_" + str(weekNumber)
+                conn.execute('''CREATE TABLE IF NOT EXISTS ''' + tableName + ''' (recipe text, row int, column int)''')
+                conn.execute("""INSERT INTO """ + tableName + """ VALUES (?, ?, ?);""", (recipeName, row, column))
+            

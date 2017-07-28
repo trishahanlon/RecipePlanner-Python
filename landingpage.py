@@ -1,5 +1,7 @@
 from tkinter import *
 from addRecipe import AddARecipe
+from tkinter import messagebox
+import datetime
 from mealPlan import MakeMealPlan
 from PIL import Image, ImageTk
 import sqlite3
@@ -7,13 +9,14 @@ import sqlite3
 LARGE_FONT=("Trebuchet MS", 24)
 MEDIUM_FONT=("Trebuchet MS", 12)
 
-
+recipeNames = []
 
 class LandingPage(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
 
         viewRecipeFrame = Frame(self, bg="#f8f8f8")
+        menuFrame = Frame(self, bg="#e7e7e7")
 
         frame = Frame(self, bg="#f8f8f8")
         frame.pack(expand=True, fill='both')
@@ -34,7 +37,6 @@ class LandingPage(Frame):
             frame.pack_forget()
             viewRecipeFrame.pack(expand=True, fill='both')
 
-            recipeNames = []
             database_file = "meal_planner.db"
             with sqlite3.connect(database_file) as conn:
                 cursor = conn.cursor()
@@ -43,15 +45,17 @@ class LandingPage(Frame):
                     for row in result.fetchall():
                         name = row[0]
                         recipeNames.append(name)
+            conn.close()
             for i in range(len(recipeNames)):
                 label = Label(viewRecipeFrame, font=MEDIUM_FONT, bg="#f8f8f8", fg="#000000", text=recipeNames[i])
                 label.pack()
-                label.bind("<Button-1>", lambda  event, x=recipeNames[i]: callback(x, database_file))
+                label.bind("<Button-1>", lambda  event, x=recipeNames[i]: [callback(x), viewRecipeFrame.pack_forget()])
 
-        def callback(recipeName, database_file):
+
+        def callback(recipeName):
                 viewRecipeFrame.pack_forget()
+                database_file = "meal_planner.db"
 
-                menuFrame = Frame(self, bg="#e7e7e7")
                 menuFrame.pack(fill='both')
                 load = Image.open("home.jpg")
                 render = ImageTk.PhotoImage(load)
@@ -78,12 +82,46 @@ class LandingPage(Frame):
                             directions = row[5]
                     string = ("Name: {} \n Cook time: {} \n Number of Servings: {} \n Ingredients: {} \n Directions: {}".format(name, time, servings, ingredients, directions))
                     Label(viewDetailsFrame, text=string, font=MEDIUM_FONT, bg="#f8f8f8", fg="#000000").pack(side=LEFT)
-
                 conn.close()
 
                 Button(menuFrame, text="Delete", highlightbackground="#e7e7e7",
-                       command=lambda: print("delete")).pack(side=RIGHT)
+                       command=lambda: delete_recipe(name)).pack(side=RIGHT)
 
+        def delete_recipe(recipeName):
+            database_file = "meal_planner.db"
+
+            now = datetime.datetime.now()
+            dt = datetime.date(now.year, now.month, now.day)
+            weekNumber = dt.isocalendar()[1]
+
+            tableName = "recipes_" + str(weekNumber)
+            with sqlite3.connect(database_file) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""SELECT recipe FROM """ + tableName + """ WHERE recipe = """ + "\"" + recipeName + "\"")
+                returnObject = cursor.fetchone()
+                if returnObject:
+                    print(returnObject[0])
+                    messagebox.showerror("Cannot Delete",
+                                         "Cannot delete recipe when it's used in the current week's menu.")
+                    # conn.close()
+                else:
+                    # conn.close()
+                    actually_delete(recipeName)
+
+        def actually_delete(recipeName):
+            queryString = "\"" + recipeName + "\""
+            with sqlite3.connect("meal_planner.db") as conn:
+                cursor = conn.cursor()
+                cursor.execute("""DELETE FROM recipe WHERE name = """ + "\"" + recipeName + "\"")
+                print(cursor.rowcount)
+                if cursor.rowcount == 1:
+                    messagebox.showinfo("Success", "Recipe Deleted.")
+                    menuFrame.pack_forget()
+                    viewRecipeFrame.pack(expand=True, fill='both')
+                elif cursor.rowcount == 0:
+                    messagebox.showerror("Cannot Delete",
+                                         "Cannot delete recipe, please try again.")
+            conn.close()
 
 
 

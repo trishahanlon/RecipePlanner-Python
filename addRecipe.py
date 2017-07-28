@@ -43,13 +43,16 @@ class AddARecipe(Frame):
         entryFrame.pack(side=LEFT)
 
         Label(labelFrame, text="Recipe Name: ", font=MEDIUM_FONT, bg="#f8f8f8").pack(pady=4,expand=NO)
-        Entry(entryFrame, show="", textvariable=name, bg="#ffffff", fg="#000000").pack(pady=1, expand=YES)
+        name_entry = Entry(entryFrame, show="", textvariable=name, bg="#ffffff", fg="#000000")
+        name_entry.pack(pady=1, expand=YES)
 
         Label(labelFrame, text="Cook time (in mins): ", font=MEDIUM_FONT, bg="#f8f8f8").pack(pady=4, expand=NO)
-        Entry(entryFrame, show="", textvariable=time, bg="#ffffff", fg="#000000").pack(pady=1, expand=YES)
+        time_entry = Entry(entryFrame, show="", textvariable=time, bg="#ffffff", fg="#000000")
+        time_entry.pack(pady=1, expand=YES)
 
         Label(labelFrame, text="Number of Servings: ", font=MEDIUM_FONT, bg="#f8f8f8").pack(pady=5, expand=NO)
-        Entry(entryFrame, show="", textvariable=servings, bg="#ffffff", fg="#000000").pack(pady=1, expand=YES)
+        servings_entry = Entry(entryFrame, show="", textvariable=servings, bg="#ffffff", fg="#000000")
+        servings_entry.pack(pady=1, expand=YES)
 
         #
         # Bottom
@@ -63,22 +66,20 @@ class AddARecipe(Frame):
         leftFrame = Frame(bottomFrame, bg="#f8f8f8")
         leftFrame.pack(side=LEFT, padx=50)
         Label(leftFrame, text="Ingredients \n (quantity unit ingredient, i.e. 1 cup milk)", font=MEDIUM_FONT, bg="#f8f8f8").pack(side=TOP, expand=YES)
-        ingredients = Text(leftFrame, bg='#d3d3d3', width=50, height=20)
-        ingredients.pack(fill=Y, side=LEFT)
+        ingredients_text = Text(leftFrame, bg='#d3d3d3', width=50, height=20)
+        ingredients_text.pack(fill=Y, side=LEFT)
 
         rightFrame = Frame(bottomFrame, bg="#f8f8f8")
         rightFrame.pack(side=RIGHT, padx=50)
         Label(rightFrame, text="Directions \n", font=MEDIUM_FONT, bg="#f8f8f8").pack(side=TOP, expand=YES)
-        directions = Text(rightFrame, bg='#d3d3d3', width=50, height=20)
-        directions.pack(fill=Y, side=RIGHT)
+        directions_text = Text(rightFrame, bg='#d3d3d3', width=50, height=20)
+        directions_text.pack(fill=Y, side=RIGHT)
 
 
         submit_button = Button(self, text="Submit Recipe", highlightbackground="#f8f8f8", command = lambda: [(submit(name.get(), time.get(),
-                                                                                          servings.get(), favoriteVar.get(),ingredients.get("1.0", END),
-                                                                                          directions.get("1.0", END)))])
+                                                                                          servings.get(), favoriteVar.get(),ingredients_text.get("1.0", END),
+                                                                                          directions_text.get("1.0", END)))])
         submit_button.pack()
-
-
 
         def submit(name, time, servings, favorite, ingredients, directions):
             print("Name: ", len(name))
@@ -102,7 +103,11 @@ class AddARecipe(Frame):
                                  (name text, time int, servings int, favorite text, ingredients text, directions text)''')
                             conn.execute("""INSERT INTO recipe VALUES (?, ?, ?, ?, ?, ?);""",
                                          (name, intTime, intServings, favorite, ingredients, directions))
-
+                            name_entry.delete(0, END)
+                            servings_entry.delete(0, END)
+                            time_entry.delete(0,END)
+                            ingredients_text.delete(1.0, END)
+                            directions_text.delete(1.0, END)
                         messagebox.showinfo("Success", "Recipe Added.")
                         controller.show_frame(LandingPage)
                     except ValueError:

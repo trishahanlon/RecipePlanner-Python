@@ -60,6 +60,18 @@ class MakeMealPlan(Frame):
             sep = ttk.Separator(menu, orient="vertical")
             sep.grid(row=i+1, column=1, padx=5, sticky="nsew")
 
+        # database_file = "meal_planner.db"
+        # tableName = "recipes_" + str(weekNumber)
+        # with sqlite3.connect(database_file) as conn:
+        #     cursor = conn.cursor()
+        #     selection = cursor.execute("""SELECT * FROM """ + tableName)
+        #     for result in [selection]:
+        #         for row in result.fetchall():
+        #             name = row[0]
+        #             rowDB = row[1]
+        #             columnDB = row[2]
+        #             print(name, rowDB, columnDB)
+
         buttonDict = {}
         listOfButtons = []
         for rows in range(len(labels)):

@@ -11,9 +11,26 @@ MEDIUM_FONT=("Trebuchet MS", 12)
 
 recipeNames = []
 
+
+def set_up_database():
+    database_file = "meal_planner.db"
+    now = datetime.datetime.now()
+    dt = datetime.date(now.year, now.month, now.day)
+    weekNumber = dt.isocalendar()[1]
+
+    with sqlite3.connect(database_file) as conn:
+        # create the tables if they haven't been created yet
+        recipeTableName = "recipes_" + str(weekNumber)
+        conn.execute('''CREATE TABLE IF NOT EXISTS ''' + recipeTableName + ''' (recipe text, row int, column int)''')
+        ingredientsTableName = "ingredients_" + str(weekNumber)
+        conn.execute('''CREATE TABLE IF NOT EXISTS ''' + ingredientsTableName + ''' (ingredients text)''')
+        conn.execute('''CREATE TABLE IF NOT EXISTS recipe (name text, time int, servings int, favorite text, ingredients text, directions text)''')
+
 class LandingPage(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
+
+        set_up_database()
 
         viewRecipeFrame = Frame(self, bg="#f8f8f8")
         menuFrame = Frame(self, bg="#e7e7e7")
@@ -34,6 +51,8 @@ class LandingPage(Frame):
         Button(frame, text="Add A Recipe", highlightbackground="#f8f8f8", command=lambda: controller.show_frame(AddARecipe)).pack(fill=Y)
         Button(frame, text="Make a Meal Plan", highlightbackground="#f8f8f8", command=lambda: controller.show_frame(MakeMealPlan)).pack(fill=Y)
         Button(frame, text="View Recipes", highlightbackground="#f8f8f8", command=lambda: view_recipes()).pack(fill=Y)
+
+
 
         def view_recipes():
             frame.pack_forget()

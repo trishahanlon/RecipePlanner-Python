@@ -43,13 +43,13 @@ class AddARecipe(Frame):
         entryFrame.pack(side=LEFT)
 
         Label(labelFrame, text="Recipe Name: ", font=MEDIUM_FONT, bg="#f8f8f8").pack(pady=4,expand=NO)
-        Entry(entryFrame, show="", textvariable=name, fg="#f8f8f8").pack(pady=1, expand=YES)
+        Entry(entryFrame, show="", textvariable=name, bg="#ffffff", fg="#000000").pack(pady=1, expand=YES)
 
         Label(labelFrame, text="Cook time (in mins): ", font=MEDIUM_FONT, bg="#f8f8f8").pack(pady=4, expand=NO)
-        Entry(entryFrame, show="", textvariable=time, fg="#f8f8f8").pack(pady=1, expand=YES)
+        Entry(entryFrame, show="", textvariable=time, bg="#ffffff", fg="#000000").pack(pady=1, expand=YES)
 
         Label(labelFrame, text="Number of Servings: ", font=MEDIUM_FONT, bg="#f8f8f8").pack(pady=5, expand=NO)
-        Entry(entryFrame, show="", textvariable=servings, fg="#f8f8f8").pack(pady=1, expand=YES)
+        Entry(entryFrame, show="", textvariable=servings, bg="#ffffff", fg="#000000").pack(pady=1, expand=YES)
 
         #
         # Bottom
@@ -75,35 +75,39 @@ class AddARecipe(Frame):
 
         submit_button = Button(self, text="Submit Recipe", highlightbackground="#f8f8f8", command = lambda: [(submit(name.get(), time.get(),
                                                                                           servings.get(), favoriteVar.get(),ingredients.get("1.0", END),
-                                                                                          directions.get("1.0", END)), controller.show_frame(LandingPage)),
-                                                                              messagebox.showinfo("Success", "Successful saved to database.")])
+                                                                                          directions.get("1.0", END)))])
         submit_button.pack()
 
 
 
-def submit(name, time, servings, favorite, ingredients, directions):
-    print("Name: ", name)
-    print("Time: ", time)
-    print("servings: ", servings)
-    print("favorite: ", favorite)
-    print("ingredients: ", ingredients)
-    print("directions: ", directions)
+        def submit(name, time, servings, favorite, ingredients, directions):
+            print("Name: ", len(name))
+            print("Time: ", len(time))
+            print("servings: ", len(servings))
+            print("favorite: ", favorite)
+            print("ingredients: ", len(ingredients))
+            print("directions: ", len(directions))
 
+            database_file = "meal_planner.db"
+            if len(name) == 0 or len(time) == 0 or len(servings) == 0 or len(ingredients) == 0 or len(directions) == 0:
+                messagebox.showerror("Missing Value", "All fields must be completed.")
+            else:
+                try:
+                    intTime = int(time)
+                    try:
+                        intServings = int(servings)
+                        with sqlite3.connect(database_file) as conn:
+                            # create the table if it hasn't been created yet
+                            conn.execute('''CREATE TABLE IF NOT EXISTS recipe
+                                 (name text, time int, servings int, favorite text, ingredients text, directions text)''')
+                            conn.execute("""INSERT INTO recipe VALUES (?, ?, ?, ?, ?, ?);""",
+                                         (name, intTime, intServings, favorite, ingredients, directions))
 
-    database_file = "meal_planner.db"
-    try:
-        intTime = int(time)
-        try:
-            intServings = int(servings)
-            with sqlite3.connect(database_file) as conn:
-                # create the table if it hasn't been created yet
-                conn.execute('''CREATE TABLE IF NOT EXISTS recipe
-                     (name text, time int, servings int, favorite text, ingredients text, directions text)''')
-                conn.execute("""INSERT INTO recipe VALUES (?, ?, ?, ?, ?, ?);""",
-                             (name, intTime, intServings, favorite, ingredients, directions))
-        except ValueError:
-            messagebox.showerror("Incorrect Value", "Servings must be an int")
-    except ValueError:
-        messagebox.showerror("Incorrect Value", "Time must be an int")
+                        messagebox.showinfo("Success", "Recipe Added.")
+                        controller.show_frame(LandingPage)
+                    except ValueError:
+                        messagebox.showerror("Incorrect Value", "Servings must be an int")
+                except ValueError:
+                    messagebox.showerror("Incorrect Value", "Time must be an int")
 
 

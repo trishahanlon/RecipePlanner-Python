@@ -71,7 +71,7 @@ class MakeMealPlan(Frame):
 
         def add_meal(rowLocation, columnLocation):
             menu.pack_forget()
-            add_meal_frame = Frame(self)
+            add_meal_frame = Frame(self, bg="#f8f8f8")
             add_meal_frame.rowconfigure(0, weight=1)
             add_meal_frame.columnconfigure(0, weight=1)
             add_meal_frame.rowconfigure(1, weight=3)
@@ -87,15 +87,11 @@ class MakeMealPlan(Frame):
                 for result in [selection]:
                     for row in result.fetchall():
                         name = row[0]
-                        time = row[1]
-                        servings = row[2]
-                        favorite = row[3]
                         ingredients = row[4]
-                        directions = row[5]
                         recipeNames.append(name)
                         ingredientList.append(ingredients)
             for i in range(len(recipeNames)):
-                Button(add_meal_frame, text=recipeNames[i], command=lambda x=recipeNames[i], y=ingredientList[i]:add_recipe(x, y, add_meal_frame,
+                Button(add_meal_frame, text=recipeNames[i], highlightbackground="#f8f8f8", command=lambda x=recipeNames[i], y=ingredientList[i]:add_recipe(x, y, add_meal_frame,
                                                                                      rowLocation, columnLocation)).grid(row=i, column=0)
 
         def add_recipe(recipe, ingredients, view, row, column):
@@ -106,9 +102,14 @@ class MakeMealPlan(Frame):
                     key.destroy()
 
             save_ingredients(ingredients)
-            recipeLabel = Label(menu, text=recipe)
+            recipeLabel = Label(menu, text=recipe, bg="#f8f8f8")
             recipeLabel.grid(row = row, column = column)
+            recipeLabel.bind("<Button-1>", lambda event: callback(recipe))
             menu.pack()
+
+        def callback(recipeName):
+            print("callback")
+            #do query here to get the recipe info
 
         def view_grocery_list():
             print("grocery== list")

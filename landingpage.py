@@ -67,7 +67,7 @@ class LandingPage(Frame):
 
                     conn.close()
 
-                    ##need to figure out the positioning of this button. 
+                    ##need to figure out the positioning of this button.
                     Button(viewDetailsFrame, text="Home", highlightbackground="#f8f8f8",
                            command=lambda: [viewDetailsFrame.pack_forget(), frame.pack(expand=True, fill='both')]).pack(side=TOP)
 

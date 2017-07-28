@@ -60,27 +60,48 @@ class MakeMealPlan(Frame):
             sep = ttk.Separator(menu, orient="vertical")
             sep.grid(row=i+1, column=1, padx=5, sticky="nsew")
 
-        # database_file = "meal_planner.db"
-        # tableName = "recipes_" + str(weekNumber)
-        # with sqlite3.connect(database_file) as conn:
-        #     cursor = conn.cursor()
-        #     selection = cursor.execute("""SELECT * FROM """ + tableName)
-        #     for result in [selection]:
-        #         for row in result.fetchall():
-        #             name = row[0]
-        #             rowDB = row[1]
-        #             columnDB = row[2]
-        #             print(name, rowDB, columnDB)
+        database_file = "meal_planner.db"
+        tableName = "recipes_" + str(weekNumber)
+        menuDict = {}
+        with sqlite3.connect(database_file) as conn:
+            cursor = conn.cursor()
+            selection = cursor.execute("""SELECT * FROM """ + tableName)
+            for result in [selection]:
+                for row in result.fetchall():
+                    name = row[0]
+                    rowDB = row[1]
+                    columnDB = row[2]
+                    menuDict[name] = (rowDB, columnDB)
+        valueArray = []
+        keyArray = []
+        for (key, value) in menuDict.items():
+            print(key, value)
+            keyArray.append(key)
+            valueArray.append(value)
 
         buttonDict = {}
         listOfButtons = []
+
         for rows in range(len(labels)):
             for columns in range(len(columnLabels)):
-                buttons = Button(menu, text="Add meal to day", highlightbackground="#f8f8f8", command=lambda x=rows + 1, y=columns + 2: add_meal(x, y))
-                buttons.grid(row=rows+1, column=columns+2)
-                buttons.position = (rows+1, columns+2)
-                buttonDict[buttons] = buttons.position
-                listOfButtons.append(buttons)
+
+                buttons = Button(menu, text="Add meal", highlightbackground="#f8f8f8",
+                                 command=lambda x=rows + 1, y=columns + 2: add_meal(x, y))
+
+                locationTuple = (rows+1, columns+2)
+                for key, value in menuDict.items():
+                    if locationTuple == value:
+                        print("we have a match")
+                        #dont add a button
+                        recipeLabel = Label(menu, text=key, bg="#f8f8f8", padx=1, pady=1)
+                        recipeLabel.grid(row=value[0], column=value[1])
+                        recipeLabel.bind("<Button-1>", lambda event: callback(key))
+                    else:
+                        buttons.grid(row=rows + 1, column=columns + 2)
+                        buttons.position = (rows + 1, columns + 2)
+                        buttonDict[buttons] = buttons.position
+                        listOfButtons.append(buttons)
+
 
         def add_meal(rowLocation, columnLocation):
             menu.pack_forget()

@@ -5,9 +5,10 @@ from isoweek import Week
 from tkinter import ttk
 import sqlite3
 import string
+from collections import Counter
 
-LARGE_FONT=("Verdana", 24)
-MEDIUM_FONT=("Verdana", 14)
+LARGE_FONT=("Trebuchet MS", 24)
+MEDIUM_FONT=("Trebuchet MS", 14)
 
 NOW = datetime.datetime.now()
 
@@ -131,26 +132,31 @@ class makeMealPlan(Frame):
             topView.grid_forget()
             i = 0
             database_file = "meal_planner.db"
+            item_array = []
             with sqlite3.connect(database_file) as conn:
                 cursor = conn.cursor()
                 tableName = "ingredients_" + str(weekNumber)
                 selection = cursor.execute("""SELECT * FROM """ + tableName)
                 for result in [selection]:
                     for row in result.fetchall():
-                        # print(row)
-                        i = i +1
-
-                        row = str(row)
-                        row = row.translate(row.maketrans("","","()'{}<>,"))
-                        row = row.replace('\\n', '')
-                        row = row.replace('\\t', '')
-                        digit = re.findall(r'[\/\d\.]+', row)
-                        print(str(digit))
                         print(row)
+                        for ingredient in row:
+                            print(ingredient)
+                            item_array.append(str(ingredient).split())
+                        i = i +1
+                        Label(shoppingListFrame, text=ingredient, font=MEDIUM_FONT, justify=LEFT).grid(row=i, column=0, sticky="w")
 
-                        Label(shoppingListFrame, text=str(row), font=MEDIUM_FONT).grid(row=i, column=0)
 
-            Button(shoppingListFrame, text = "Return to Menu View", command=lambda: [shoppingListFrame.grid_forget(), topView.grid(), menu.grid()]).grid(row=i+1, column=0)
+            j = 0
+            for item in item_array:
+                print(item)
+
+
+
+
+
+            Button(shoppingListFrame, text = "Return to Menu View", command=lambda: [shoppingListFrame.grid_forget(),
+                                                                                     topView.grid(), menu.grid()]).grid(row=i+1, column=0)
 
 
         def saveIngredients(ingredients):

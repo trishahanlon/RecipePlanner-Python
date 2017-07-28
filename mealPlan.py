@@ -118,7 +118,7 @@ class MakeMealPlan(Frame):
             print(recipeName)
             with sqlite3.connect(database_file) as conn:
                 cursor = conn.cursor()
-                selection = cursor.execute("""SELECT * FROM recipe WHERE name = """ + "\"" + recipeName + "\"")
+                selection = cursor.execute("""SELECT * FROM recipe WHERE name = ?;""", (recipeName, ))
                 for result in [selection]:
                     for row in result.fetchall():
                         name = row[0]
@@ -158,7 +158,7 @@ class MakeMealPlan(Frame):
             with sqlite3.connect(database_file) as conn:
                 cursor = conn.cursor()
                 tableName = "ingredients_" + str(weekNumber)
-                selection = cursor.execute("""SELECT * FROM """ + tableName)
+                selection = cursor.execute("""SELECT * FROM ?;""", (tableName, ))
                 for result in [selection]:
                     for row in result.fetchall():
                         print(row)

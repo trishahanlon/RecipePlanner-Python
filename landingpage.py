@@ -17,6 +17,7 @@ class LandingPage(Frame):
 
         viewRecipeFrame = Frame(self, bg="#f8f8f8")
         menuFrame = Frame(self, bg="#e7e7e7")
+        viewDetailsFrame = Frame(self, bg="#f8f8f8")
 
         frame = Frame(self, bg="#f8f8f8")
         frame.pack(expand=True, fill='both')
@@ -67,11 +68,10 @@ class LandingPage(Frame):
                 label = Label(menuFrame, text="View Recipe", font=LARGE_FONT, bg="#e7e7e7", fg="#272822")
                 label.pack(side=LEFT, padx=300)
 
-                viewDetailsFrame = Frame(self, bg="#f8f8f8")
                 viewDetailsFrame.pack(expand=True, fill='both')
                 with sqlite3.connect(database_file) as conn:
                     cursor = conn.cursor()
-                    selection = cursor.execute("""SELECT * FROM recipe WHERE name = """ + "\"" + recipeName + "\"" )
+                    selection = cursor.execute("""SELECT * FROM recipe WHERE name = ?;""", (recipeName, ))
                     for result in [selection]:
                         for row in result.fetchall():
                             name = row[0]
@@ -97,34 +97,28 @@ class LandingPage(Frame):
             tableName = "recipes_" + str(weekNumber)
             with sqlite3.connect(database_file) as conn:
                 cursor = conn.cursor()
-                cursor.execute("""SELECT recipe FROM """ + tableName + """ WHERE recipe = """ + "\"" + recipeName + "\"")
-                returnObject = cursor.fetchone()
-                if returnObject:
-                    print(returnObject[0])
+                cursor.execute("""SELECT count(*) FROM """ + tableName + """ WHERE recipe = ?;""", (recipeName, ))
+                returnObject = cursor.fetchone()[0]
+                if returnObject == 0:
+                    actually_delete(recipeName)
+                    print("there is no component named {}".format(recipeName))
+                else:
+                    print("component {} found".format(recipeName))
                     messagebox.showerror("Cannot Delete",
                                          "Cannot delete recipe when it's used in the current week's menu.")
-                    # conn.close()
-                else:
-                    # conn.close()
-                    actually_delete(recipeName)
+
 
         def actually_delete(recipeName):
-            queryString = "\"" + recipeName + "\""
             with sqlite3.connect("meal_planner.db") as conn:
                 cursor = conn.cursor()
-                cursor.execute("""DELETE FROM recipe WHERE name = """ + "\"" + recipeName + "\"")
-                print(cursor.rowcount)
+                cursor.execute("""DELETE FROM recipe WHERE name = ?;""", (recipeName, ))
                 if cursor.rowcount == 1:
                     messagebox.showinfo("Success", "Recipe Deleted.")
                     menuFrame.pack_forget()
-                    viewRecipeFrame.pack(expand=True, fill='both')
+                    viewDetailsFrame.pack_forget()
+                    viewRecipeFrame.pack_forget()
+                    frame.pack(expand=True, fill='both')
                 elif cursor.rowcount == 0:
-                    messagebox.showerror("Cannot Delete",
-                                         "Cannot delete recipe, please try again.")
+                    messagebox.showerror("Cannot Delete", "Error.")
             conn.close()
-
-
-
-
-
 

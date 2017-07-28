@@ -12,23 +12,23 @@ MEDIUM_FONT=("Trebuchet MS", 14)
 class MakeMealPlan(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent, bg="#f8f8f8")
-        menuFrame = Frame(self, bg="#e7e7e7")
-        menuFrame.pack(fill='both')
+        menu_frame = Frame(self, bg="#e7e7e7")
+        menu_frame.pack(fill='both')
         load = Image.open("home.jpg")
         render = ImageTk.PhotoImage(load)
         from landingpage import LandingPage
-        img = Button(menuFrame, image=render, borderwidth=0, highlightthickness=0, highlightbackground="#e7e7e7",
+        img = Button(menu_frame, image=render, borderwidth=0, highlightthickness=0, highlightbackground="#e7e7e7",
                      command=lambda: controller.show_frame(LandingPage))
         img.image = render
         img.pack(side=LEFT)
 
-        label = Label(menuFrame, text="Meal Planner", font=LARGE_FONT, bg="#e7e7e7", fg="#272822")
+        label = Label(menu_frame, text="Meal Planner", font=LARGE_FONT, bg="#e7e7e7", fg="#272822")
         label.pack(side=LEFT, padx=289)
 
-        groceryButton = Button(menuFrame, text="Grocery List", highlightbackground="#e7e7e7", command=lambda: view_grocery_list())
+        groceryButton = Button(menu_frame, text="Grocery List", highlightbackground="#e7e7e7", command=lambda: view_grocery_list())
         groceryButton.pack(side=LEFT)
 
-        viewRecipeFrame = Frame(self, bg="#f8f8f8")
+        view_recipe_frame = Frame(self, bg="#f8f8f8")
 
         now = datetime.datetime.now()
         dt = datetime.date(now.year, now.month, now.day)
@@ -36,10 +36,6 @@ class MakeMealPlan(Frame):
         w = Week(now.year, weekNumber)
 
         menu = Frame(self, bg="#f8f8f8")
-        menu.rowconfigure(0, weight=1)
-        menu.columnconfigure(0, weight=1)
-        menu.rowconfigure(1, weight=3)
-        menu.columnconfigure(1, weight=3)
         menu.pack()
 
         columnLabels = ["Breakfast", "Lunch", "Dinner"]
@@ -91,11 +87,10 @@ class MakeMealPlan(Frame):
                 locationTuple = (rows+1, columns+2)
                 for key, value in menuDict.items():
                     if locationTuple == value:
-                        print("we have a match")
                         #dont add a button
                         recipeLabel = Label(menu, text=key, bg="#f8f8f8", padx=1, pady=1)
                         recipeLabel.grid(row=value[0], column=value[1])
-                        recipeLabel.bind("<Button-1>", lambda event: callback(key))
+                        recipeLabel.bind("<Button-1>", lambda event, x=key: callback(x))
                     else:
                         buttons.grid(row=rows + 1, column=columns + 2)
                         buttons.position = (rows + 1, columns + 2)
@@ -105,12 +100,8 @@ class MakeMealPlan(Frame):
 
         def add_meal(rowLocation, columnLocation):
             menu.pack_forget()
-            viewRecipeFrame.forget()
+            view_recipe_frame.forget()
             add_meal_frame = Frame(self, bg="#f8f8f8")
-            add_meal_frame.rowconfigure(0, weight=1)
-            add_meal_frame.columnconfigure(0, weight=1)
-            add_meal_frame.rowconfigure(1, weight=3)
-            add_meal_frame.columnconfigure(1, weight=3)
             add_meal_frame.pack()
 
             recipeNames = []
@@ -131,7 +122,7 @@ class MakeMealPlan(Frame):
 
         def add_recipe(recipe, ingredients, view, row, column):
             view.pack_forget()
-            viewRecipeFrame.forget()
+            view_recipe_frame.forget()
             searchIndex = (row, column)
             for key, value in buttonDict.items():
                 if value == searchIndex:
@@ -145,10 +136,10 @@ class MakeMealPlan(Frame):
 
         def callback(recipeName):
             menu.pack_forget()
-            viewRecipeFrame.pack(expand=True, fill='both')
+            view_recipe_frame.pack(expand=True, fill='both')
             groceryButton.pack_forget()
             database_file = "meal_planner.db"
-            print(recipeName)
+            # print(recipeName)
             with sqlite3.connect(database_file) as conn:
                 cursor = conn.cursor()
                 selection = cursor.execute("""SELECT * FROM recipe WHERE name = ?;""", (recipeName, ))
@@ -163,22 +154,18 @@ class MakeMealPlan(Frame):
                         string = ("Name: {} \n Cook time: {} \n Number of Servings: {} \n ".format(name, time, servings))
                         secondString = ("Ingredients: {}".format(ingredients))
                         thirdString = ("Directions: {}".format(directions))
-            Label(viewRecipeFrame, text=string, font=MEDIUM_FONT, bg="#f8f8f8", fg="#000000").pack(side=TOP)
-            Label(viewRecipeFrame, text=secondString, font=MEDIUM_FONT, bg="#f8f8f8", fg="#000000").pack(side=TOP)
-            Label(viewRecipeFrame, text=thirdString, font=MEDIUM_FONT, bg="#f8f8f8", fg="#000000").pack(side=TOP)
-            returnButton = Button(menuFrame, text = "Return to Menu", highlightbackground="#e7e7e7", command=lambda: [viewRecipeFrame.pack_forget(),
+            Label(view_recipe_frame, text=string, font=MEDIUM_FONT, bg="#f8f8f8", fg="#000000").grid(row=1, column=0, sticky="nsew", padx=400)
+            Label(view_recipe_frame, text=secondString, font=MEDIUM_FONT, bg="#f8f8f8", fg="#000000").grid(row=2, column=0, sticky="nsew")
+            Label(view_recipe_frame, text=thirdString, font=MEDIUM_FONT, bg="#f8f8f8", fg="#000000").grid(row=3, column=0, sticky="nsew")
+            returnButton = Button(menu_frame, text = "Return to Menu", highlightbackground="#e7e7e7", command=lambda: [view_recipe_frame.pack_forget(),
                                                                                      menu.pack(), returnButton.pack_forget(), label.configure(text="Meal Planer"),
                                                                                     groceryButton.pack(side=RIGHT)])
             returnButton.pack(side=RIGHT)
 
 
         def view_grocery_list():
-            groceryListFrame = Frame(self,  bg="#f8f8f8")
-            groceryListFrame.rowconfigure(0, weight=1)
-            groceryListFrame.columnconfigure(0, weight=1)
-            groceryListFrame.rowconfigure(1, weight=3)
-            groceryListFrame.columnconfigure(1, weight=3)
-            groceryListFrame.pack()
+            grocery_list_frame = Frame(self,  bg="#f8f8f8")
+            grocery_list_frame.pack()
 
             menu.pack_forget()
             groceryButton.pack_forget()
@@ -198,12 +185,12 @@ class MakeMealPlan(Frame):
                             print(ingredient)
                             item_array.append(str(ingredient).split())
                         i = i +1
-                        Label(groceryListFrame, text=ingredient, bg="#f8f8f8", font=MEDIUM_FONT, justify=LEFT).grid(row=i, column=0, sticky="w")
+                        Label(grocery_list_frame, text=ingredient, bg="#f8f8f8", font=MEDIUM_FONT, justify=LEFT).grid(row=i, column=0, sticky="w")
 
             for item in item_array:
                 print(item)
 
-            returnButton = Button(menuFrame, text = "Return to Menu", highlightbackground="#e7e7e7", command=lambda: [groceryListFrame.pack_forget(),
+            returnButton = Button(menu_frame, text = "Return to Menu", highlightbackground="#e7e7e7", command=lambda: [grocery_list_frame.pack_forget(),
                                                                                      menu.pack(), returnButton.pack_forget(), label.configure(text="Meal Planer"),
                                                                                     groceryButton.pack(side=RIGHT)])
             returnButton.pack(side=RIGHT)

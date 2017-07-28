@@ -1,12 +1,13 @@
 from tkinter import *
-from addRecipe import addARecipe
-from mealPlan import makeMealPlan
+from addRecipe import AddARecipe
+from mealPlan import MakeMealPlan
 from PIL import Image, ImageTk
 
 LARGE_FONT=("Trebuchet MS", 24)
 MEDIUM_FONT=("Trebuchet MS", 12)
 
-class firstPage(Frame):
+
+class LandingPage(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
         frame = Frame(self, bg="#f8f8f8")
@@ -20,5 +21,5 @@ class firstPage(Frame):
         img.image = render
         img.pack(fill='both', pady=40)
 
-        Button(frame, text="Add A Recipe", highlightbackground="#f8f8f8", command=lambda: controller.show_frame(addARecipe)).pack(fill=Y)
-        Button(frame, text="Make a Meal Plan", highlightbackground="#f8f8f8", command=lambda: controller.show_frame(makeMealPlan)).pack(fill=Y)
+        Button(frame, text="Add A Recipe", highlightbackground="#f8f8f8", command=lambda: controller.show_frame(AddARecipe)).pack(fill=Y)
+        Button(frame, text="Make a Meal Plan", highlightbackground="#f8f8f8", command=lambda: controller.show_frame(MakeMealPlan)).pack(fill=Y)

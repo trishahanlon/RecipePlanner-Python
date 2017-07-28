@@ -6,7 +6,8 @@ from PIL import Image, ImageTk
 LARGE_FONT=("Trebuchet MS", 24)
 MEDIUM_FONT=("Trebuchet MS", 12)
 
-class addARecipe(Frame):
+
+class AddARecipe(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent, bg="#f8f8f8")
         #
@@ -14,11 +15,11 @@ class addARecipe(Frame):
         #
         menuFrame = Frame(self, bg="#e7e7e7")
         menuFrame.pack(fill='both')
-        from firstpage import firstPage
+        from landingpage import LandingPage
         load = Image.open("home.jpg")
         render = ImageTk.PhotoImage(load)
         img = Button(menuFrame, image = render, borderwidth=0, highlightthickness=0, highlightbackground="#e7e7e7",
-                     command=lambda: controller.show_frame(firstPage))
+                     command=lambda: controller.show_frame(LandingPage))
         img.image = render
         img.pack(side=LEFT)
         label = Label(menuFrame, text="Add a Recipe", font=LARGE_FONT, bg="#e7e7e7", fg="#272822")
@@ -57,7 +58,7 @@ class addARecipe(Frame):
         bottomFrame.pack(fill='both')
 
         Label(bottomFrame, text="Add to your favorites?", font=MEDIUM_FONT, bg="#f8f8f8",).pack(side=TOP)
-        Checkbutton(bottomFrame, text="Favorite", font=MEDIUM_FONT, variable=favoriteVar, bg="#f8f8f8",).pack(side=TOP)
+        Checkbutton(bottomFrame, text="Favorite", font=MEDIUM_FONT, variable=favoriteVar, bg="#f8f8f8").pack(side=TOP)
 
         leftFrame = Frame(bottomFrame, bg="#f8f8f8")
         leftFrame.pack(side=LEFT, padx=50)
@@ -72,9 +73,9 @@ class addARecipe(Frame):
         directions.pack(fill=Y, side=RIGHT)
 
 
-        submit_button = Button(self, text="Submit Recipe",highlightbackground="#f8f8f8", command = lambda: [(submit(name.get(), time.get(),
+        submit_button = Button(self, text="Submit Recipe", highlightbackground="#f8f8f8", command = lambda: [(submit(name.get(), time.get(),
                                                                                           servings.get(), favoriteVar.get(),ingredients.get("1.0", END),
-                                                                                          directions.get("1.0", END)), controller.show_frame(firstPage)),
+                                                                                          directions.get("1.0", END)), controller.show_frame(LandingPage)),
                                                                               messagebox.showinfo("Success", "Successful saved to database.")])
         submit_button.pack()
 

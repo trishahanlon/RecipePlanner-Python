@@ -1,5 +1,4 @@
 from tkinter import *
-import calendar
 import datetime
 from isoweek import Week
 from tkinter import ttk
@@ -9,54 +8,41 @@ from PIL import Image, ImageTk
 LARGE_FONT=("Trebuchet MS", 24)
 MEDIUM_FONT=("Trebuchet MS", 14)
 
-NOW = datetime.datetime.now()
 
-class makeMealPlan(Frame):
+class MakeMealPlan(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent, bg="#f8f8f8")
         menuFrame = Frame(self, bg="#e7e7e7")
-        menuFrame.grid(row=0, column=0)
+        menuFrame.pack(fill='both')
         load = Image.open("home.jpg")
         render = ImageTk.PhotoImage(load)
-        from firstpage import firstPage
+        from landingpage import LandingPage
         img = Button(menuFrame, image=render, borderwidth=0, highlightthickness=0, highlightbackground="#e7e7e7",
-                     command=lambda: controller.show_frame(firstPage))
+                     command=lambda: controller.show_frame(LandingPage))
         img.image = render
         img.pack(side=LEFT)
+
         label = Label(menuFrame, text="Meal Planner", font=LARGE_FONT, bg="#e7e7e7", fg="#272822")
-        label.pack(side=LEFT, padx=300)
+        label.pack(side=LEFT, padx=289)
 
+        groceryButton = Button(menuFrame, text="Grocery List", highlightbackground="#e7e7e7", command=lambda: view_grocery_list())
+        groceryButton.pack(side=LEFT)
 
-        topView = Frame(self)
-
-        # topView.grid(row=0, column=0)
-
-        dt = datetime.date(NOW.year, NOW.month, NOW.day)
+        now = datetime.datetime.now()
+        dt = datetime.date(now.year, now.month, now.day)
         weekNumber = dt.isocalendar()[1]
-        w = Week(NOW.year, weekNumber)
+        w = Week(now.year, weekNumber)
 
-        cal_x = calendar.month(NOW.year, NOW.month, w=2, l=1)
-        cal_out = Label(
-            topView,
-            bg='#d3d3d3',
-            font=('courier', 12),
-            justify=LEFT,
-            text=cal_x
-        )
-        cal_out.grid(row=1, column=0, columnspan=2)
-
-        Button(topView, text="View Shopping List", command=lambda: viewShoppingList()).grid(row=3, column=1)
-
-        menu = Frame(self)
+        menu = Frame(self, bg="#f8f8f8")
         menu.rowconfigure(0, weight=1)
         menu.columnconfigure(0, weight=1)
         menu.rowconfigure(1, weight=3)
         menu.columnconfigure(1, weight=3)
-        menu.grid(row=2, column=0)
+        menu.pack()
 
         columnLabels = ["Breakfast", "Lunch", "Dinner"]
         for i in range(len(columnLabels)):
-            Label(menu, text = columnLabels[i], font = ("Verdana", 16), fg= "#d3d3d3").grid(row=0, column=i+2, pady= 10,
+            Label(menu, text = columnLabels[i], font = ("Trebuchet MS", 16), bg="#f8f8f8").grid(row=0, column=i+2, pady= 10,
                                                                                         padx=85, sticky="nsew")
         mondayText = "Monday " + str(w.monday())
         tuesdayText = "Tuesday " + str(w.tuesday())
@@ -68,7 +54,7 @@ class makeMealPlan(Frame):
 
         labels = [mondayText, tuesdayText, wednesdayText, thursdayText, fridayText, saturdayText, sundayText]
         for i in range(len(labels)):
-            Label(menu, text = labels[i]).grid(row=i+1, column=0, padx = 5, pady=15, sticky="w")
+            Label(menu, font = ("Trebuchet MS", 12), bg="#f8f8f8", text = labels[i]).grid(row=i+1, column=0, padx = 5, pady=15, sticky="w")
             sep = ttk.Separator(menu, orient="vertical")
             sep.grid(row=i+1, column=1, padx=5, sticky="nsew")
 
@@ -77,21 +63,20 @@ class makeMealPlan(Frame):
         for rows in range(len(labels)):
             for columns in range(len(columnLabels)):
                 # buttons = Button(menu, text="Add meal to day", command=lambda x=rows+1, y=columns+2: addMeal(x, y))
-                buttons = Button(menu, text="Add meal to day", command=lambda x=rows + 1, y=columns + 2: addMeal(x, y))
+                buttons = Button(menu, text="Add meal to day", highlightbackground="#f8f8f8", command=lambda x=rows + 1, y=columns + 2: add_meal(x, y))
                 buttons.grid(row=rows+1, column=columns+2)
                 buttons.position = (rows+1, columns+2)
                 buttonDict[buttons] = buttons.position
                 listOfButtons.append(buttons)
 
-        def addMeal(rowLocation, columnLocation):
-            menu.grid_forget()
-            topView.grid_forget()
-            addMealFrame = Frame(self)
-            addMealFrame.rowconfigure(0, weight=1)
-            addMealFrame.columnconfigure(0, weight=1)
-            addMealFrame.rowconfigure(1, weight=3)
-            addMealFrame.columnconfigure(1, weight=3)
-            addMealFrame.grid(row=2, column=0)
+        def add_meal(rowLocation, columnLocation):
+            menu.pack_forget()
+            add_meal_frame = Frame(self)
+            add_meal_frame.rowconfigure(0, weight=1)
+            add_meal_frame.columnconfigure(0, weight=1)
+            add_meal_frame.rowconfigure(1, weight=3)
+            add_meal_frame.columnconfigure(1, weight=3)
+            add_meal_frame.pack()
 
             recipeNames = []
             ingredientList = []
@@ -110,33 +95,34 @@ class makeMealPlan(Frame):
                         recipeNames.append(name)
                         ingredientList.append(ingredients)
             for i in range(len(recipeNames)):
-                Button(addMealFrame, text=recipeNames[i], command=lambda x=recipeNames[i], y=ingredientList[i]:addRecipe(x, y, addMealFrame,
+                Button(add_meal_frame, text=recipeNames[i], command=lambda x=recipeNames[i], y=ingredientList[i]:add_recipe(x, y, add_meal_frame,
                                                                                      rowLocation, columnLocation)).grid(row=i, column=0)
 
-        def addRecipe(recipe, ingredients, view, row, column):
-            view.grid_forget()
+        def add_recipe(recipe, ingredients, view, row, column):
+            view.pack_forget()
             searchIndex = (row, column)
             for key, value in buttonDict.items():
                 if value == searchIndex:
                     key.destroy()
 
-            saveIngredients(ingredients)
+            save_ingredients(ingredients)
             recipeLabel = Label(menu, text=recipe)
             recipeLabel.grid(row = row, column = column)
-            topView.grid()
-            menu.grid()
+            menu.pack()
 
-        def viewShoppingList():
-            print("shopping list")
-            shoppingListFrame = Frame(self)
-            shoppingListFrame.rowconfigure(0, weight=1)
-            shoppingListFrame.columnconfigure(0, weight=1)
-            shoppingListFrame.rowconfigure(1, weight=3)
-            shoppingListFrame.columnconfigure(1, weight=3)
-            shoppingListFrame.grid(row=2, column=0)
+        def view_grocery_list():
+            print("grocery== list")
+            groceryListFrame = Frame(self)
+            groceryListFrame.rowconfigure(0, weight=1)
+            groceryListFrame.columnconfigure(0, weight=1)
+            groceryListFrame.rowconfigure(1, weight=3)
+            groceryListFrame.columnconfigure(1, weight=3)
+            groceryListFrame.pack()
 
-            menu.grid_forget()
-            topView.grid_forget()
+            menu.pack_forget()
+            groceryButton.pack_forget()
+            label.configure(text="Grocery List")
+
             i = 0
             database_file = "meal_planner.db"
             item_array = []
@@ -151,7 +137,7 @@ class makeMealPlan(Frame):
                             print(ingredient)
                             item_array.append(str(ingredient).split())
                         i = i +1
-                        Label(shoppingListFrame, text=ingredient, font=MEDIUM_FONT, justify=LEFT).grid(row=i, column=0, sticky="w")
+                        Label(groceryListFrame, text=ingredient, font=MEDIUM_FONT, justify=LEFT).grid(row=i, column=0, sticky="w")
 
 
             j = 0
@@ -159,14 +145,13 @@ class makeMealPlan(Frame):
                 print(item)
 
 
+            returnButton = Button(menuFrame, text = "Return to Menu", highlightbackground="#e7e7e7", command=lambda: [groceryListFrame.pack_forget(),
+                                                                                     menu.pack(), returnButton.pack_forget(), label.configure(text="Meal Planer"),
+                                                                                    groceryButton.pack(side=RIGHT)])
+            returnButton.pack(side=RIGHT)
 
 
-
-            Button(shoppingListFrame, text = "Return to Menu View", command=lambda: [shoppingListFrame.grid_forget(),
-                                                                                     topView.grid(), menu.grid()]).grid(row=i+1, column=0)
-
-
-        def saveIngredients(ingredients):
+        def save_ingredients(ingredients):
             database_file = "meal_planner.db"
             with sqlite3.connect(database_file) as conn:
                 # create the table if it hasn't been created yet

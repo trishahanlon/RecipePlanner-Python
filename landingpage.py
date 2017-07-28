@@ -18,6 +18,7 @@ class LandingPage(Frame):
         viewRecipeFrame = Frame(self, bg="#f8f8f8")
         menuFrame = Frame(self, bg="#e7e7e7")
         viewDetailsFrame = Frame(self, bg="#f8f8f8")
+        deleteMenuFrame = Frame(self, bg="#e7e7e7")
 
         frame = Frame(self, bg="#f8f8f8")
         frame.pack(expand=True, fill='both')
@@ -50,9 +51,9 @@ class LandingPage(Frame):
             img.pack(side=LEFT)
             label = Label(menuFrame, text="View Recipe", font=LARGE_FONT, bg="#e7e7e7", fg="#272822")
             label.pack(side=LEFT, padx=300)
+
             #add this view
             viewRecipeFrame.pack(expand=True, fill='both')
-
             database_file = "meal_planner.db"
 
             with sqlite3.connect(database_file) as conn:
@@ -60,7 +61,6 @@ class LandingPage(Frame):
                 cursor.execute("""SELECT count(*) FROM recipe""")
                 returnObject = cursor.fetchone()[0]
                 recipe_list_length = returnObject
-
 
             i = 0
             with sqlite3.connect(database_file) as conn:
@@ -77,40 +77,41 @@ class LandingPage(Frame):
                         label.bind("<Button-1>", lambda event: [callback(name), viewRecipeFrame.pack_forget()])
 
         def callback(recipeName):
-                viewRecipeFrame.pack_forget()
-                database_file = "meal_planner.db"
+            menuFrame.pack_forget()
+            viewRecipeFrame.pack_forget()
+            database_file = "meal_planner.db"
 
-                menuFrame.pack(fill='both')
-                load = Image.open("home.jpg")
-                render = ImageTk.PhotoImage(load)
-                img = Button(menuFrame, image=render, borderwidth=0, highlightthickness=0,
-                             highlightbackground="#e7e7e7",
-                             command=lambda: [frame.pack(expand=True, fill='both'),
-                                              viewDetailsFrame.pack_forget(),
-                                              menuFrame.pack_forget(),
-                                              viewRecipeFrame.pack_forget()])
-                img.image = render
-                img.pack(side=LEFT)
-                label = Label(menuFrame, text="View Recipe", font=LARGE_FONT, bg="#e7e7e7", fg="#272822")
-                label.pack(side=LEFT, padx=300)
+            deleteMenuFrame.pack(fill='both')
+            load = Image.open("home.jpg")
+            render = ImageTk.PhotoImage(load)
+            img = Button(deleteMenuFrame, image=render, borderwidth=0, highlightthickness=0,
+                         highlightbackground="#e7e7e7",
+                         command=lambda: [frame.pack(expand=True, fill='both'),
+                                          viewDetailsFrame.pack_forget(),
+                                          deleteMenuFrame.pack_forget(),
+                                          viewRecipeFrame.pack_forget()])
+            img.image = render
+            img.pack(side=LEFT)
+            label = Label(deleteMenuFrame, text="View Recipe", font=LARGE_FONT, bg="#e7e7e7", fg="#272822")
+            label.pack(side=LEFT, padx=300)
 
-                viewDetailsFrame.pack(expand=True, fill='both')
-                with sqlite3.connect(database_file) as conn:
-                    cursor = conn.cursor()
-                    selection = cursor.execute("""SELECT * FROM recipe WHERE name = ?;""", (recipeName, ))
-                    for result in [selection]:
-                        for row in result.fetchall():
-                            name = row[0]
-                            time = row[1]
-                            servings = row[2]
-                            ingredients = row[4]
-                            directions = row[5]
-                    string = ("Name: {} \n Cook time: {} \n Number of Servings: {} \n Ingredients: {} \n Directions: {}".format(name, time, servings, ingredients, directions))
-                    Label(viewDetailsFrame, text=string, font=MEDIUM_FONT, bg="#f8f8f8", fg="#000000").pack(side=TOP)
-                conn.close()
+            Button(deleteMenuFrame, text="Delete", highlightbackground="#e7e7e7",
+                   command=lambda: delete_recipe(name)).pack(side=RIGHT)
 
-                Button(menuFrame, text="Delete", highlightbackground="#e7e7e7",
-                       command=lambda: delete_recipe(name)).pack(side=RIGHT)
+            viewDetailsFrame.pack(expand=True, fill='both')
+            with sqlite3.connect(database_file) as conn:
+                cursor = conn.cursor()
+                selection = cursor.execute("""SELECT * FROM recipe WHERE name = ?;""", (recipeName, ))
+                for result in [selection]:
+                    for row in result.fetchall():
+                        name = row[0]
+                        time = row[1]
+                        servings = row[2]
+                        ingredients = row[4]
+                        directions = row[5]
+                        string = ("Name: {} \n Cook time: {} \n Number of Servings: {} \n Ingredients: {} \n Directions: {}".format(name, time, servings, ingredients, directions))
+                        Label(viewDetailsFrame, text=string, font=MEDIUM_FONT, bg="#f8f8f8", fg="#000000").pack(side=TOP)
+            conn.close()
 
         def delete_recipe(recipeName):
             database_file = "meal_planner.db"
@@ -132,7 +133,6 @@ class LandingPage(Frame):
                     messagebox.showerror("Cannot Delete",
                                          "Cannot delete recipe when it's used in the current week's menu.")
 
-
         def actually_delete(recipeName):
             with sqlite3.connect("meal_planner.db") as conn:
                 cursor = conn.cursor()
@@ -140,6 +140,7 @@ class LandingPage(Frame):
                 if cursor.rowcount == 1:
                     messagebox.showinfo("Success", "Recipe Deleted.")
                     menuFrame.pack_forget()
+                    deleteMenuFrame.pack_forget()
                     viewDetailsFrame.pack_forget()
                     viewRecipeFrame.pack_forget()
                     frame.pack(expand=True, fill='both')

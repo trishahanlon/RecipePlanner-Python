@@ -1,3 +1,6 @@
+# Trisha Moyer
+# Version 3.5
+
 from tkinter import *
 from addRecipe import AddARecipe
 from tkinter import messagebox
@@ -11,6 +14,11 @@ MEDIUM_FONT=("Trebuchet MS", 12)
 
 
 def set_up_database():
+    """Creates the database and tables needed for the project.
+
+    Keyword arguments: None
+    :return: Nothing
+    """
     database_file = "meal_planner.db"
     now = datetime.datetime.now()
     dt = datetime.date(now.year, now.month, now.day)
@@ -26,18 +34,17 @@ def set_up_database():
 
 class LandingPage(Frame):
     def __init__(self, parent, controller):
+        """Initalizes first page of the app"""
         Frame.__init__(self, parent)
-
+        #set up the database for the app
         set_up_database()
-
+        #create the frames for this page
         view_recipe_frame = Frame(self, bg="#f8f8f8")
         menu_frame = Frame(self, bg="#e7e7e7")
         view_details_frame = Frame(self, bg="#f8f8f8")
         delete_menu_frame = Frame(self, bg="#e7e7e7")
-
         frame = Frame(self, bg="#f8f8f8")
         frame.pack(expand=True, fill='both')
-
         Label(frame, text="Trisha's Meal Planner", font=LARGE_FONT, bg="#f8f8f8", fg="#000000").pack(fill='both', pady=20)
 
         load = Image.open("recipe_card.jpg")
@@ -50,9 +57,12 @@ class LandingPage(Frame):
         Button(frame, text="Make a Meal Plan", highlightbackground="#f8f8f8", command=lambda: controller.show_frame(MakeMealPlan)).pack(fill=Y)
         Button(frame, text="View Recipes", highlightbackground="#f8f8f8", command=lambda: view_recipes()).pack(fill=Y)
 
-
-
         def view_recipes():
+            """Allows the user to view the recipes in the database.
+
+            Keyword arguments: None
+            :return: Nothing
+            """
             frame.pack_forget()
             #add the menu
             menu_frame.pack(fill='both')
@@ -72,7 +82,6 @@ class LandingPage(Frame):
             #add this view
             view_recipe_frame.pack(expand=True, fill='both')
             database_file = "meal_planner.db"
-
             recipe_array = []
             with sqlite3.connect(database_file) as conn:
                 cursor = conn.cursor()
@@ -86,13 +95,19 @@ class LandingPage(Frame):
                 label = Label(view_recipe_frame, font=MEDIUM_FONT, bg="#f8f8f8", fg="#000000",
                               text=recipe)
                 label.pack()
-                label.bind("<Button-1>", lambda event: [callback(name), view_recipe_frame.pack_forget()])
+                label.bind("<Button-1>", lambda event: [view_details(name), view_recipe_frame.pack_forget()])
 
-        def callback(recipeName):
+        def view_details(recipeName):
+            """Called when a user clicks on a recipe.
+            Gives them the details of the recipe.
+
+            Keyword arguments: recipeName -- recipe name that we want to view.
+            :return: Nothing
+            """
+            #updatae the frame like always
             menu_frame.pack_forget()
             view_recipe_frame.pack_forget()
             database_file = "meal_planner.db"
-
             delete_menu_frame.pack(fill='both')
             load = Image.open("home.jpg")
             render = ImageTk.PhotoImage(load)
@@ -106,11 +121,10 @@ class LandingPage(Frame):
             img.pack(side=LEFT)
             label = Label(delete_menu_frame, text="View Recipe", font=LARGE_FONT, bg="#e7e7e7", fg="#272822")
             label.pack(side=LEFT, padx=300)
-
             Button(delete_menu_frame, text="Delete", highlightbackground="#e7e7e7",
                    command=lambda: delete_recipe(name)).pack(side=RIGHT)
-
             view_details_frame.pack(expand=True, fill='both')
+            #query the database to get out the recipe
             with sqlite3.connect(database_file) as conn:
                 cursor = conn.cursor()
                 selection = cursor.execute("""SELECT * FROM recipe WHERE name = ?;""", (recipeName, ))
@@ -126,13 +140,18 @@ class LandingPage(Frame):
             conn.close()
 
         def delete_recipe(recipeName):
-            database_file = "meal_planner.db"
+            """Called when a user clicks on delete a recipe.
 
+            Keyword arguments: recipeName -- recipe name that the user wants to delete.
+            :return: Nothing
+            """
+            
+            database_file = "meal_planner.db"
             now = datetime.datetime.now()
             dt = datetime.date(now.year, now.month, now.day)
             week_number = dt.isocalendar()[1]
-
             tableName = "recipes_" + str(week_number)
+            # we want to query the database, and if it's part of this week's menu - don't delete.
             with sqlite3.connect(database_file) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""SELECT count(*) FROM """ + tableName + """ WHERE recipe = ?;""", (recipeName, ))
@@ -146,6 +165,11 @@ class LandingPage(Frame):
                                          "Cannot delete recipe when it's used in the current week's menu.")
 
         def actually_delete(recipeName):
+            """Called when the recipe the user wants to delete is not part of the menu.
+
+            Keyword arguments: recipeName -- recipe name that the user wants to delete.
+            :return: Nothing
+            """
             with sqlite3.connect("meal_planner.db") as conn:
                 cursor = conn.cursor()
                 cursor.execute("""DELETE FROM recipe WHERE name = ?;""", (recipeName, ))

@@ -1,3 +1,6 @@
+# Trisha Moyer
+# Version 3.5
+
 from tkinter import *
 import datetime
 from isoweek import Week

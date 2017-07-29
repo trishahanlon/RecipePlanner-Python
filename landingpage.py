@@ -14,14 +14,14 @@ def set_up_database():
     database_file = "meal_planner.db"
     now = datetime.datetime.now()
     dt = datetime.date(now.year, now.month, now.day)
-    weekNumber = dt.isocalendar()[1]
+    week_number = dt.isocalendar()[1]
 
     with sqlite3.connect(database_file) as conn:
         # create the tables if they haven't been created yet
-        recipeTableName = "recipes_" + str(weekNumber)
-        conn.execute('''CREATE TABLE IF NOT EXISTS ''' + recipeTableName + ''' (recipe text, row int, column int)''')
-        ingredientsTableName = "ingredients_" + str(weekNumber)
-        conn.execute('''CREATE TABLE IF NOT EXISTS ''' + ingredientsTableName + ''' (ingredients text)''')
+        recipe_table_name = "recipes_" + str(week_number)
+        conn.execute('''CREATE TABLE IF NOT EXISTS ''' + recipe_table_name + ''' (recipe text, row int, column int)''')
+        ingredients_table_name = "ingredients_" + str(week_number)
+        conn.execute('''CREATE TABLE IF NOT EXISTS ''' + ingredients_table_name + ''' (ingredients text)''')
         conn.execute('''CREATE TABLE IF NOT EXISTS recipe (name text, time int, servings int, favorite text, ingredients text, directions text)''')
 
 class LandingPage(Frame):
@@ -30,10 +30,10 @@ class LandingPage(Frame):
 
         set_up_database()
 
-        viewRecipeFrame = Frame(self, bg="#f8f8f8")
-        menuFrame = Frame(self, bg="#e7e7e7")
-        viewDetailsFrame = Frame(self, bg="#f8f8f8")
-        deleteMenuFrame = Frame(self, bg="#e7e7e7")
+        view_recipe_frame = Frame(self, bg="#f8f8f8")
+        menu_frame = Frame(self, bg="#e7e7e7")
+        view_details_frame = Frame(self, bg="#f8f8f8")
+        delete_menu_frame = Frame(self, bg="#e7e7e7")
 
         frame = Frame(self, bg="#f8f8f8")
         frame.pack(expand=True, fill='both')
@@ -55,29 +55,23 @@ class LandingPage(Frame):
         def view_recipes():
             frame.pack_forget()
             #add the menu
-            menuFrame.pack(fill='both')
+            menu_frame.pack(fill='both')
             load = Image.open("home.jpg")
             render = ImageTk.PhotoImage(load)
-            img = Button(menuFrame, image=render, borderwidth=0, highlightthickness=0,
+            img = Button(menu_frame, image=render, borderwidth=0, highlightthickness=0,
                          highlightbackground="#e7e7e7",
                          command=lambda: [frame.pack(expand=True, fill='both'),
-                                          viewDetailsFrame.pack_forget(),
-                                          menuFrame.pack_forget(),
-                                          viewRecipeFrame.pack_forget()])
+                                          view_details_frame.pack_forget(),
+                                          menu_frame.pack_forget(),
+                                          view_recipe_frame.pack_forget()])
             img.image = render
             img.pack(side=LEFT)
-            label = Label(menuFrame, text="View Recipe", font=LARGE_FONT, bg="#e7e7e7", fg="#272822")
+            label = Label(menu_frame, text="View Recipe", font=LARGE_FONT, bg="#e7e7e7", fg="#272822")
             label.pack(side=LEFT, padx=300)
 
             #add this view
-            viewRecipeFrame.pack(expand=True, fill='both')
+            view_recipe_frame.pack(expand=True, fill='both')
             database_file = "meal_planner.db"
-
-            with sqlite3.connect(database_file) as conn:
-                cursor = conn.cursor()
-                cursor.execute("""SELECT count(*) FROM recipe""")
-                returnObject = cursor.fetchone()[0]
-                recipe_list_length = returnObject
 
             recipe_array = []
             with sqlite3.connect(database_file) as conn:
@@ -89,34 +83,34 @@ class LandingPage(Frame):
                         recipe_array.append(name)
 
             for recipe in recipe_array:
-                label = Label(viewRecipeFrame, font=MEDIUM_FONT, bg="#f8f8f8", fg="#000000",
+                label = Label(view_recipe_frame, font=MEDIUM_FONT, bg="#f8f8f8", fg="#000000",
                               text=recipe)
                 label.pack()
-                label.bind("<Button-1>", lambda event: [callback(name), viewRecipeFrame.pack_forget()])
+                label.bind("<Button-1>", lambda event: [callback(name), view_recipe_frame.pack_forget()])
 
         def callback(recipeName):
-            menuFrame.pack_forget()
-            viewRecipeFrame.pack_forget()
+            menu_frame.pack_forget()
+            view_recipe_frame.pack_forget()
             database_file = "meal_planner.db"
 
-            deleteMenuFrame.pack(fill='both')
+            delete_menu_frame.pack(fill='both')
             load = Image.open("home.jpg")
             render = ImageTk.PhotoImage(load)
-            img = Button(deleteMenuFrame, image=render, borderwidth=0, highlightthickness=0,
+            img = Button(delete_menu_frame, image=render, borderwidth=0, highlightthickness=0,
                          highlightbackground="#e7e7e7",
                          command=lambda: [frame.pack(expand=True, fill='both'),
-                                          viewDetailsFrame.pack_forget(),
-                                          deleteMenuFrame.pack_forget(),
-                                          viewRecipeFrame.pack_forget()])
+                                          view_details_frame.pack_forget(),
+                                          delete_menu_frame.pack_forget(),
+                                          view_recipe_frame.pack_forget()])
             img.image = render
             img.pack(side=LEFT)
-            label = Label(deleteMenuFrame, text="View Recipe", font=LARGE_FONT, bg="#e7e7e7", fg="#272822")
+            label = Label(delete_menu_frame, text="View Recipe", font=LARGE_FONT, bg="#e7e7e7", fg="#272822")
             label.pack(side=LEFT, padx=300)
 
-            Button(deleteMenuFrame, text="Delete", highlightbackground="#e7e7e7",
+            Button(delete_menu_frame, text="Delete", highlightbackground="#e7e7e7",
                    command=lambda: delete_recipe(name)).pack(side=RIGHT)
 
-            viewDetailsFrame.pack(expand=True, fill='both')
+            view_details_frame.pack(expand=True, fill='both')
             with sqlite3.connect(database_file) as conn:
                 cursor = conn.cursor()
                 selection = cursor.execute("""SELECT * FROM recipe WHERE name = ?;""", (recipeName, ))
@@ -128,7 +122,7 @@ class LandingPage(Frame):
                         ingredients = row[4]
                         directions = row[5]
                         string = ("Name: {} \n Cook time: {} \n Number of Servings: {} \n Ingredients: {} \n Directions: {}".format(name, time, servings, ingredients, directions))
-                        Label(viewDetailsFrame, text=string, font=MEDIUM_FONT, bg="#f8f8f8", fg="#000000").pack(side=TOP)
+                        Label(view_details_frame, text=string, font=MEDIUM_FONT, bg="#f8f8f8", fg="#000000").pack(side=TOP)
             conn.close()
 
         def delete_recipe(recipeName):
@@ -136,14 +130,14 @@ class LandingPage(Frame):
 
             now = datetime.datetime.now()
             dt = datetime.date(now.year, now.month, now.day)
-            weekNumber = dt.isocalendar()[1]
+            week_number = dt.isocalendar()[1]
 
-            tableName = "recipes_" + str(weekNumber)
+            tableName = "recipes_" + str(week_number)
             with sqlite3.connect(database_file) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""SELECT count(*) FROM """ + tableName + """ WHERE recipe = ?;""", (recipeName, ))
-                returnObject = cursor.fetchone()[0]
-                if returnObject == 0:
+                return_object = cursor.fetchone()[0]
+                if return_object == 0:
                     actually_delete(recipeName)
                     print("there is no component named {}".format(recipeName))
                 else:
@@ -157,12 +151,11 @@ class LandingPage(Frame):
                 cursor.execute("""DELETE FROM recipe WHERE name = ?;""", (recipeName, ))
                 if cursor.rowcount == 1:
                     messagebox.showinfo("Success", "Recipe Deleted.")
-                    menuFrame.pack_forget()
-                    deleteMenuFrame.pack_forget()
-                    viewDetailsFrame.pack_forget()
-                    viewRecipeFrame.pack_forget()
+                    menu_frame.pack_forget()
+                    delete_menu_frame.pack_forget()
+                    view_details_frame.pack_forget()
+                    view_recipe_frame.pack_forget()
                     frame.pack(expand=True, fill='both')
                 elif cursor.rowcount == 0:
                     messagebox.showerror("Cannot Delete", "Error.")
             conn.close()
-

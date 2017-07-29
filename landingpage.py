@@ -9,8 +9,6 @@ import sqlite3
 LARGE_FONT=("Trebuchet MS", 24)
 MEDIUM_FONT=("Trebuchet MS", 12)
 
-recipeNames = []
-
 
 def set_up_database():
     database_file = "meal_planner.db"
@@ -81,19 +79,20 @@ class LandingPage(Frame):
                 returnObject = cursor.fetchone()[0]
                 recipe_list_length = returnObject
 
-            i = 0
+            recipe_array = []
             with sqlite3.connect(database_file) as conn:
                 cursor = conn.cursor()
                 selection = cursor.execute("""SELECT name FROM recipe""")
                 for result in [selection]:
                     for row in result.fetchall():
                         name = row[0]
-                        recipeNames.append(name)
-                        i = i +1
-                        label = Label(viewRecipeFrame, font=MEDIUM_FONT, bg="#f8f8f8", fg="#000000",
-                                      text=name)
-                        label.pack()
-                        label.bind("<Button-1>", lambda event: [callback(name), viewRecipeFrame.pack_forget()])
+                        recipe_array.append(name)
+
+            for recipe in recipe_array:
+                label = Label(viewRecipeFrame, font=MEDIUM_FONT, bg="#f8f8f8", fg="#000000",
+                              text=recipe)
+                label.pack()
+                label.bind("<Button-1>", lambda event: [callback(name), viewRecipeFrame.pack_forget()])
 
         def callback(recipeName):
             menuFrame.pack_forget()

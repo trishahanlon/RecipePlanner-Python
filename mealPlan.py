@@ -13,6 +13,7 @@ class MakeMealPlan(Frame):
         Frame.__init__(self, parent, bg="#f8f8f8")
         menu_frame = Frame(self, bg="#e7e7e7")
         menu_frame.pack(fill='both')
+
         load = Image.open("home.jpg")
         render = ImageTk.PhotoImage(load)
         from landingpage import LandingPage
@@ -159,6 +160,12 @@ class MakeMealPlan(Frame):
             Label(view_recipe_frame, text=secondString, font=MEDIUM_FONT, bg="#f8f8f8", fg="#000000").grid(row=2, column=0, sticky="nsew")
             Label(view_recipe_frame, text=thirdString, font=MEDIUM_FONT, bg="#f8f8f8", fg="#000000").grid(row=3, column=0, sticky="nsew")
 
+            return_button = Button(menu_frame, text = "Return to Menu", highlightbackground="#e7e7e7", command=lambda: [view_recipe_frame.pack_forget(),
+                                                                                                                        return_button.grid_forget(),
+                                                                                     menu.pack(), label.configure(text="Meal Planer"), groceryButton.grid(row=0, column=2, sticky="nsew")])
+            # returnButton.pack(side=RIGHT)
+            return_button.grid(row=0, column=4, sticky="nsew")
+
         def view_grocery_list():
             grocery_list_frame = Frame(self,  bg="#f8f8f8")
             grocery_list_frame.pack()
@@ -182,10 +189,6 @@ class MakeMealPlan(Frame):
                             item_array.append(str(ingredient).split())
                         i = i +1
                         Label(grocery_list_frame, text=ingredient, bg="#f8f8f8", font=MEDIUM_FONT, justify=LEFT).grid(row=i, column=0, sticky="w")
-
-            for item in item_array:
-                print(item)
-
             return_button = Button(menu_frame, text = "Return to Menu", highlightbackground="#e7e7e7", command=lambda: [grocery_list_frame.pack_forget(),
                                                                                                                         return_button.grid_forget(),
                                                                                      menu.pack(), label.configure(text="Meal Planer"), groceryButton.grid(row=0, column=2, sticky="nsew")])

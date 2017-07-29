@@ -1,6 +1,9 @@
 # Huge shoutout to youtube user: sentdex at https://www.youtube.com/watch?v=jBUpjijYtCk which
 # helped me figure out how to do multiple pages with tkinter
 
+# Trisha Moyer
+# Version 3.5
+
 from tkinter import *
 from addRecipe import AddARecipe
 from mealPlan import MakeMealPlan
@@ -11,7 +14,9 @@ MEDIUM_FONT=("Verdana", 12)
 
 
 class main(Tk):
+    """Main starting point of the app."""
     def __init__(self, *args, **kwargs):
+        """Initialize the main class"""
         Tk.__init__(self, *args, **kwargs)
         container = Frame(self)
         container.pack(fill="both", expand=TRUE)
@@ -27,6 +32,7 @@ class main(Tk):
         self.show_frame(LandingPage)
 
     def show_frame(self, cont):
+        """Show the frame"""
         frame = self.frames[cont]
         frame.tkraise()
 

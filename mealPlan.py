@@ -8,7 +8,6 @@ from PIL import Image, ImageTk
 LARGE_FONT=("Trebuchet MS", 24)
 MEDIUM_FONT=("Trebuchet MS", 14)
 
-
 class MakeMealPlan(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent, bg="#f8f8f8")
@@ -83,6 +82,7 @@ class MakeMealPlan(Frame):
 
                 buttons = Button(menu, text="Add meal", highlightbackground="#f8f8f8",
                                  command=lambda x=rows + 1, y=columns + 2: add_meal(x, y))
+                buttons.grid(row=rows + 1, column=columns + 2)
 
                 locationTuple = (rows+1, columns+2)
                 for key, value in menuDict.items():

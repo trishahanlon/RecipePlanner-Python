@@ -13,9 +13,8 @@ MEDIUM_FONT=("Trebuchet MS", 12)
 class AddARecipe(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent, bg="#f8f8f8")
-        #
-        # Menu
-        #
+
+        # big ol mess of frames... tkinter has proven interesting with how they manage frames/screens
         menu_frame = Frame(self, bg="#e7e7e7")
         menu_frame.pack(fill='both')
         from landingpage import LandingPage
@@ -28,9 +27,6 @@ class AddARecipe(Frame):
         label = Label(menu_frame, text="Add a Recipe", font=LARGE_FONT, bg="#e7e7e7", fg="#272822")
         label.pack(side=LEFT, padx=300)
 
-        #
-        # Middle
-        #
         name = StringVar()
         time = StringVar()
         servings = StringVar()
@@ -57,9 +53,6 @@ class AddARecipe(Frame):
         servings_entry = Entry(entry_frame, show="", textvariable=servings, bg="#ffffff", fg="#000000")
         servings_entry.pack(pady=1, expand=YES)
 
-        #
-        # Bottom
-        #
         bottomFrame = Frame(self, bg="#f8f8f8")
         bottomFrame.pack(fill='both')
 
@@ -85,7 +78,17 @@ class AddARecipe(Frame):
         submit_button.pack()
 
         def submit(name, time, servings, favorite, ingredients, directions):
+            """Save the recipe to the database.
 
+            Keyword arguments:  name - the name of the recipe
+            time - time (in mins)
+            servings - number of servings the recipe is for
+            favorite - if favorite or not (int)
+            ingredients - ingredients needed
+            directions - direction for recipe.
+
+            :return: Nothing
+            """
             database_file = "meal_planner.db"
             if len(name) == 0 or len(time) == 0 or len(servings) == 0 or len(ingredients) == 0 or len(directions) == 0:
                 messagebox.showerror("Missing Value", "All fields must be completed.")

@@ -91,7 +91,7 @@ class MakeMealPlan(Frame):
                         #dont add a button
                         recipeLabel = Label(menu, text=key, bg="#f8f8f8", padx=1, pady=1)
                         recipeLabel.grid(row=value[0], column=value[1])
-                        recipeLabel.bind("<Button-1>", lambda event, x=key: callback(x))
+                        recipeLabel.bind("<Button-1>", lambda event, x=key: print_recipe(x))
                     else:
                         buttons.grid(row=rows + 1, column=columns + 2)
                         buttons.position = (rows + 1, columns + 2)
@@ -99,6 +99,12 @@ class MakeMealPlan(Frame):
                         list_of_buttons.append(buttons)
 
         def add_meal(rowLocation, columnLocation):
+            """Grabs meals from the database to be displayed.
+
+            Keyword arguments:  rowLocation - Row on the grid
+                                columnLocation - Column on the grid
+            :return: Nothing
+            """
             menu.pack_forget()
             view_recipe_frame.forget()
             add_meal_frame = Frame(self, bg="#f8f8f8")
@@ -121,6 +127,16 @@ class MakeMealPlan(Frame):
                                                                                      rowLocation, columnLocation)).grid(row=i, column=0)
 
         def add_recipe(recipe, ingredients, view, row, column):
+            """Adds recipe name to the grid for the meal plan.
+
+            Keyword arguments:  recipe - recipe name
+            ingredients - ingredients for that recipe
+            view - the add meal frame
+            rowLocation - Row on the grid
+            columnLocation - Column on the grid
+
+            :return: Nothing
+            """
             view.pack_forget()
             view_recipe_frame.forget()
             searchIndex = (row, column)
@@ -131,10 +147,16 @@ class MakeMealPlan(Frame):
             save_ingredients(ingredients)
             recipe_label = Label(menu, text=recipe, bg="#f8f8f8")
             recipe_label.grid(row = row, column = column)
-            recipe_label.bind("<Button-1>", lambda event: callback(recipe))
+            recipe_label.bind("<Button-1>", lambda event: print_recipe(recipe))
             menu.pack()
 
-        def callback(recipeName):
+        def print_recipe(recipeName):
+            """Prints the recipe info on a new screen.
+
+            Keyword arguments:  recipe - recipe name
+
+            :return: Nothing
+            """
             menu.pack_forget()
             view_recipe_frame.pack(expand=True, fill='both')
             grocery_button.grid_forget()
@@ -163,6 +185,13 @@ class MakeMealPlan(Frame):
             return_button.grid(row=0, column=4, sticky="nsew")
 
         def view_grocery_list():
+            """Prints the grocery list for the week.
+
+            Keyword arguments:  None
+
+            :return: Nothing
+            """
+
             grocery_list_frame = Frame(self,  bg="#f8f8f8")
             grocery_list_frame.pack()
 
@@ -192,6 +221,12 @@ class MakeMealPlan(Frame):
             return_button.grid(row=0, column=4, sticky="nsew")
 
         def save_ingredients(ingredients):
+            """Save the ingredients to the database so we can get them later for the grocery list.
+
+            Keyword arguments:  ingredients - ingredients to be saved to db
+
+            :return: Nothing
+            """
             database_file = "meal_planner.db"
             with sqlite3.connect(database_file) as conn:
                 # create the table if it hasn't been created yet
@@ -200,6 +235,14 @@ class MakeMealPlan(Frame):
                 conn.execute("""INSERT INTO """ + tableName + """ VALUES (?);""", (ingredients,))
             
         def save_weeks_recipes(recipeName, row, column):
+            """Save the week's recipe so we can keep them between app sessions.
+
+            Keyword arguments:  recipeName - the name of the recipe
+            row - the row the recipe belongs to in the menu grid
+            column - the column the recipe belongs to in the menu grid
+
+            :return: Nothing
+            """
             print("save weeks")
             database_file = "meal_planner.db"
             with sqlite3.connect(database_file) as conn:
